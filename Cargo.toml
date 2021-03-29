@@ -1,0 +1,18 @@
+[package]
+name = "webthing-rust-ffi"
+version = "0.1.0"
+authors = ["bewee"]
+edition = "2018"
+
+[lib]
+name = "webthing"
+crate-type = ["staticlib", "cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+webthing = "0.14.0"
+libc = "0.2.0"
+serde_json = "1.0"
+actix = "0.10"
+uuid = { version = "0.8", features = ["v4"] }

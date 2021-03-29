@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "regex.h": "c",
+        "pthread.h": "c",
+        "stdbool.h": "c",
+        "stdlib.h": "c",
+        "libwebthing.h": "c",
+        "typeinfo": "c"
+    }
+}
