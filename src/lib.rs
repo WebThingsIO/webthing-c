@@ -1,13 +1,15 @@
+#![deny(clippy::all)]
+#![warn(clippy::pedantic)]
+
 extern crate libc;
 
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_char};
-use std::{mem, ptr};
+use std::{mem::{self, MaybeUninit}, ptr};
 use std::sync::{RwLock, Weak, Arc, RwLockReadGuard, RwLockWriteGuard};
 use webthing::{
     Action, BaseAction, Event, BaseEvent, BaseProperty, Property, property::ValueForwarder, BaseThing, Thing, ThingsType, WebThingServer, server::ActionGenerator,
 };
-use serde_json;
 use actix::prelude::*;
 use uuid::Uuid;
 
@@ -41,7 +43,8 @@ macro_rules! json_to_cstr {
 macro_rules! from_dbox {
     ( $v:expr, $t:tt ) => {
         {
-            let zerov: Box<dyn $t> = unsafe { mem::MaybeUninit::<Box<dyn $t>>::zeroed().assume_init() };
+            #[allow(invalid_value)]
+            let zerov: Box<dyn $t> = unsafe { MaybeUninit::<Box<dyn $t>>::zeroed().assume_init() };
             let cpy: *mut Box<dyn $t> = to_box!(zerov);
             unsafe { ptr::copy_nonoverlapping($v, cpy, 1); }
             let res = unsafe{ Box::from_raw(cpy) };
@@ -739,7 +742,7 @@ pub extern "C" fn webthing_action_cancel(action: *mut Box<dyn Action>) {
 
 #[no_mangle]
 pub extern "C" fn webthing_action_as_action_description(action: *mut Box<dyn Action>) -> *const c_char {
-    undbox!( | mut action: Action | {
+    undbox!( | action: Action | {
         json_to_cstr!(&action.as_action_description())
     })
 }
@@ -756,28 +759,28 @@ pub extern "C" fn webthing_event_new(name: *mut c_char, data: *mut c_char) -> *c
 
 #[no_mangle]
 pub extern "C" fn webthing_event_get_name(event: *mut Box<dyn Event>) -> *const c_char {
-    undbox!( | mut event: Event | {
+    undbox!( | event: Event | {
         str_to_cstr!(event.get_name())
     })
 }
 
 #[no_mangle]
 pub extern "C" fn webthing_event_get_data(event: *mut Box<dyn Event>) -> *const c_char {
-    undbox!( | mut event: Event | {
+    undbox!( | event: Event | {
         json_to_cstr!(&event.get_data())
     })
 }
 
 #[no_mangle]
 pub extern "C" fn webthing_event_get_time(event: *mut Box<dyn Event>) -> *const c_char {
-    undbox!( | mut event: Event | {
+    undbox!( | event: Event | {
         str_to_cstr!(event.get_time())
     })
 }
 
 #[no_mangle]
 pub extern "C" fn webthing_event_as_event_description(event: *mut Box<dyn Event>) -> *const c_char {
-    undbox!( | mut event: Event | {
+    undbox!( | event: Event | {
         json_to_cstr!(&event.as_event_description())
     })
 }
